@@ -1,6 +1,6 @@
 const path = require("path")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
-const { title } = require("process")
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
 
 module.exports = {
     mode: "development",
@@ -10,8 +10,10 @@ module.exports = {
     output: {
         path: path.resolve(__dirname,"dist"),
         filename: "[name][contenthash].js",
-        clean: true
+        clean: true,
+        assetModuleFilename: "[name][ext]"
     },
+    devtool: "source-map",
     devServer: {
         static: {
             directory: path.resolve(__dirname, "dist")
@@ -31,6 +33,20 @@ module.exports = {
                     "css-loader",
                     "sass-loader"
                 ]
+            },
+            {
+                test:/\.js$/,
+                exclude: /node_modules/,
+                use : {
+                    loader: "babel-loader",
+                    options: {
+                        presets: ["@babel/preset-env"]
+                    }
+                }
+            },
+            {
+                test:/\.(png|svg|jpg|jpeg|gif)$/i,
+                type: "asset/resource"
             }
         ]
     },
@@ -39,6 +55,7 @@ module.exports = {
             title: "Webpack App",
             filename: "index.html",
             template: "src/template.html"
-        })
+        }),
+        new BundleAnalyzerPlugin()
     ]
 }
